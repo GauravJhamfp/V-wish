@@ -1,0 +1,132 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Yes / No Demo</title>
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
+    <div class="stage" id="stage">
+      <div class="card">
+        <h1>Will you be my Valentine? 💖</h1>
+        <p>I promise unlimited smiles, laughter, and love.</p>
+        <div id="controls">
+          <button class="btn btn-yes" id="yesBtn">Yes</button>
+          <button class="btn btn-no" id="noBtn">No</button>
+        </div>
+        <div class="small-note">
+          Tip: Click "No" multiple times — it won't go off-screen.
+        </div>
+      </div>
+    </div>
+
+    <div class="modal-overlay" id="modal">
+      <div
+        class="modal"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="modalTitle"
+      >
+        <h2 id="modalTitle">Great! 🎉</h2>
+        <p>Thanks for choosing Me.</p>
+        <button class="btn btn-yes" id="closeModal">Close</button>
+      </div>
+    </div>
+
+    <div class="love-reveal" id="loveReveal">
+      <div class="love-text">
+        💖 I Love You 💖<br>
+        <span>Forever & Always</span>
+      </div>
+    </div>
+
+    <audio id="bgMusic" loop muted>
+      <source
+        src="https://assets.mixkit.co/music/preview/mixkit-romantic-love-317.mp3"
+        type="audio/mpeg"
+      />
+    </audio>
+    <script>
+      (function () {
+        const stage = document.getElementById("stage");
+        const noBtn = document.getElementById("noBtn");
+        const yesBtn = document.getElementById("yesBtn");
+        const modal = document.getElementById("modal");
+        const closeModal = document.getElementById("closeModal");
+
+        function moveButtonRandom(e) {
+          const stageRect = stage.getBoundingClientRect();
+          const btnRect = noBtn.getBoundingClientRect();
+          const padding = 12;
+          const maxX = stageRect.width - btnRect.width - padding;
+          const maxY = stageRect.height - btnRect.height - padding;
+          const x =
+            Math.floor(Math.random() * Math.max(1, maxX - padding)) + padding;
+          const y =
+            Math.floor(Math.random() * Math.max(1, maxY - padding)) + padding;
+
+          noBtn.style.position = "absolute"; // make it movable inside stage
+          noBtn.style.left = x + "px";
+          noBtn.style.top = y + "px";
+          noBtn.style.transform = "none";
+          e.stopPropagation();
+        }
+
+        function openModal() {
+          modal.classList.add("open");
+          closeModal.focus();
+        }
+        function hideModal() {
+          modal.classList.remove("open");
+          yesBtn.focus();
+        }
+
+        noBtn.addEventListener("click", moveButtonRandom);
+        yesBtn.addEventListener("click", openModal);
+        closeModal.addEventListener("click", hideModal);
+        modal.addEventListener("click", (ev) => {
+          if (ev.target === modal) hideModal();
+        });
+        document.addEventListener("keydown", (ev) => {
+          if (ev.key === "Escape") hideModal();
+        });
+
+        window.addEventListener("resize", () => {
+          if (noBtn.style.position === "absolute") {
+            const stageRect = stage.getBoundingClientRect();
+            const btnRect = noBtn.getBoundingClientRect();
+            const padding = 12;
+            let left = parseFloat(noBtn.style.left) || 0;
+            let top = parseFloat(noBtn.style.top) || 0;
+            left = Math.min(
+              Math.max(left, padding),
+              Math.max(0, stageRect.width - btnRect.width - padding),
+            );
+            top = Math.min(
+              Math.max(top, padding),
+              Math.max(0, stageRect.height - btnRect.height - padding),
+            );
+            noBtn.style.left = left + "px";
+            noBtn.style.top = top + "px";
+          }
+        });
+
+  // audio and love reveal — attach listeners inside the IIFE where yesBtn is in scope
+  const bgMusic = document.getElementById('bgMusic');
+  const loveReveal = document.getElementById('loveReveal');
+
+  yesBtn.addEventListener('click', () => {
+    bgMusic.muted = false;
+    bgMusic.play().catch(()=>{});
+
+    setTimeout(() => {
+      loveReveal.classList.add('show');
+    }, 600);
+  });
+
+      })();
+
+    </script>
+  </body>
+</html>
